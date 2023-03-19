@@ -106,27 +106,14 @@ module RedisTest
     def configure(*options)
       options.flatten.each do |option|
         case option
-        when :default
-          ENV['REDIS_URL'] = server_url
-          Redis.current = Redis.new
-          RedisClassy.redis = Redis.current if defined? RedisClassy
         when :sidekiq
           Sidekiq.configure_server do |config|
-            config.redis = { url: server_url, namespace: 'sidekiq' }
+            config.redis = { url: server_url, db: 10 }
           end
 
           Sidekiq.configure_client do |config|
-            config.redis = { url: server_url, namespace: 'sidekiq' }
+            config.redis = { url: server_url, db: 10 }
           end
-
-        when :ohm
-          Ohm.redis = Redic.new(server_url)
-
-        when :resque
-          Resque.configure do |config|
-            config.redis = "#{server_url}/resque"
-          end
-
         else
           raise "Unable to configure #{option}"
         end
